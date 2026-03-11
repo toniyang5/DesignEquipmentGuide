@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TES Equipment Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #111;
+    --gray: #888;
+    --light: #f5f5f5;
+    --border: #e5e5e5;
+    --red: #e84040;
+    --green: #2a7f4f;
+    --accent: #111;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #fff; color: var(--black); max-width: 1200px; margin: 0 auto; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: #fff; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 60px;
+  }
+  .nav-brand { font-family: 'DM Serif Display', serif; font-size: 1.1rem; letter-spacing: 0.02em; }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { font-size: 0.82rem; font-weight: 500; color: var(--gray); text-decoration: none; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--black); }
+
+  /* HERO */
+  .hero {
+    padding: 120px 40px 60px;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1; font-weight: 400; text-align: center; }
+  .hero p { margin-top: 16px; font-size: 1rem; color: var(--gray); max-width: 500px; line-height: 1.6; text-align: center; margin-left: auto; margin-right: auto; }
+
+  /* SECTION HEADERS */
+  .section-label {
+    padding: 48px 40px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-label .tag {
+    display: inline-block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--gray); margin-bottom: 8px;
+  }
+  .section-label h2 { font-family: 'DM Serif Display', serif; font-size: 2rem; font-weight: 400; }
+
+  /* EQUIPMENT GRID */
+  .equipment-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    border-bottom: 1px solid var(--border);
+  }
+  .equip-card {
+    padding: 36px 40px; border-right: 1px solid var(--border);
+    cursor: pointer; transition: background 0.15s;
+    position: relative;
+  }
+  .equip-card:last-child { border-right: none; }
+  .equip-card:hover { background: var(--light); }
+  .equip-card .number { font-size: 0.72rem; color: var(--gray); letter-spacing: 0.1em; margin-bottom: 12px; }
+  .equip-card h3 { font-size: 1.15rem; font-weight: 500; margin-bottom: 8px; }
+  .equip-card p { font-size: 0.85rem; color: var(--gray); line-height: 1.5; }
+  .equip-card .arrow { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--border); transition: color 0.2s; }
+  .equip-card:hover .arrow { color: var(--black); }
+
+  /* EQUIPMENT DETAIL PANELS */
+  .equip-detail {
+    display: none; padding: 40px; border-bottom: 1px solid var(--border);
+    background: var(--light);
+  }
+  .equip-detail.active { display: block; }
+  .equip-detail h3 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; font-weight: 400; margin-bottom: 24px; }
+  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .detail-section h4 { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .detail-section ul { list-style: none; }
+  .detail-section ul li { font-size: 0.88rem; line-height: 1.7; color: var(--black); padding-left: 16px; position: relative; }
+  .detail-section ul li::before { content: "–"; position: absolute; left: 0; color: var(--gray); }
+  .detail-section a { color: var(--black); font-size: 0.88rem; }
+  .detail-section a:hover { text-decoration: underline; }
+  .close-btn { margin-top: 24px; display: inline-block; font-size: 0.8rem; font-weight: 500; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+  .close-btn:hover { color: var(--black); }
+
+  /* FILE SETUP */
+  .setup-tabs {
+    display: flex; border-bottom: 1px solid var(--border); padding: 0 40px;
+  }
+  .setup-tab {
+    padding: 20px 0; margin-right: 32px; font-size: 0.82rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+    color: var(--gray); border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .setup-tab.active { color: var(--black); border-bottom-color: var(--black); }
+
+  .setup-panel { display: none; padding: 48px 40px; }
+  .setup-panel.active { display: block; }
+  .setup-panel > p { font-size: 0.95rem; color: var(--gray); max-width: 640px; line-height: 1.7; margin-bottom: 40px; }
+
+  /* COMPARISON */
+  .compare-section { margin-bottom: 56px; }
+  .compare-section h4 { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); margin-bottom: 20px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 900px; margin: 0 auto; }
+  .compare-item { }
+  .compare-item .label {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    font-size: 0.82rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .label-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .label-dot.wrong { background: var(--red); }
+  .label-dot.correct { background: var(--green); }
+  .label.wrong-label { color: var(--red); }
+  .label.correct-label { color: var(--green); }
+  .compare-item img { width: 100%; max-height: 400px; object-fit: contain; border: 1px solid var(--border); display: block; }
+  .compare-item .notes { margin-top: 12px; }
+  .compare-item .notes li { font-size: 0.82rem; line-height: 1.7; color: var(--gray); list-style: none; padding-left: 16px; position: relative; }
+  .compare-item .notes li::before { content: "×"; position: absolute; left: 0; }
+  .compare-item .notes li.ok::before { content: "✓"; color: var(--green); }
+  .compare-item .notes li.ok { color: var(--black); }
+  .compare-item .notes li.bad::before { content: "✗"; color: var(--red); }
+  .compare-item .notes li.bad { color: var(--red); }
+
+  /* RULES LIST */
+  .rules { margin-top: 0; }
+  .rules-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .rules-item:last-child { border-bottom: none; }
+  .rules-num { font-size: 0.72rem; font-weight: 600; color: var(--gray); min-width: 24px; padding-top: 2px; }
+  .rules-text h5 { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+  .rules-text p { font-size: 0.85rem; color: var(--gray); line-height: 1.5; }
+
+  /* FOOTER */
+  footer { padding: 40px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  footer p { font-size: 0.8rem; color: var(--gray); }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 20px; }
+    .hero, .section-label, .equip-card, .setup-panel, .setup-tabs { padding-left: 20px; padding-right: 20px; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .equipment-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">TES Equipment Guide</div>
+  <div class="nav-links">
+    <a href="#equipment">Equipment</a>
+    <a href="#file-setup">File Setup</a>
+    <a href="#quiz">Quiz</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>Equipment & File Guide</h1>
+  <p>Everything you need to know about operating our fabrication equipment and setting up files correctly.</p>
+</section>
+
+<!-- EQUIPMENT SECTION -->
+<div id="equipment" class="section-label">
+  <span class="tag">Section 01</span>
+  <h2>Equipment Instructions</h2>
+</div>
+
+<div class="equipment-grid">
+  <div class="equip-card" onclick="toggleEquip('3d')">
+    <div class="number">01</div>
+    <h3>3D Printer</h3>
+    <p>Bambu Lab P1S — FDM multi-color printing</p>
+    <span class="arrow">→</span>
+  </div>
+  <div class="equip-card" onclick="toggleEquip('laser')">
+    <div class="number">02</div>
+    <h3>Epilog Laser Cutter</h3>
+    <p>Epilog Fusion Edge — cutting &amp; engraving</p>
+    <span class="arrow">→</span>
+  </div>
+  <div class="equip-card" onclick="toggleEquip('cricut')">
+    <div class="number">03</div>
+    <h3>Cricut Machine</h3>
+    <p>Vinyl cutting &amp; design production</p>
+    <span class="arrow">→</span>
+  </div>
+  <div class="equip-card" onclick="toggleEquip('sewing')">
+    <div class="number">04</div>
+    <h3>Sewing Machine</h3>
+    <p>Brother GS 1710 — stitching &amp; garment work</p>
+    <span class="arrow">→</span>
+  </div>
+  <div class="equip-card" onclick="toggleEquip('heatpress')">
+    <div class="number">05</div>
+    <h3>Heat Press</h3>
+    <p>Transfer printing onto fabric &amp; materials</p>
+    <span class="arrow">→</span>
+  </div>
+</div>
+
+<!-- 3D Printer Detail -->
+<div class="equip-detail" id="detail-3d">
+  <h3>3D Printer — Bambu Lab P1S</h3>
+  <div class="detail-grid">
+    <div class="detail-section">
+      <h4>Basic Operation</h4>
+      <ul>
+        <li>Open door when printing to avoid heat creep</li>
+        <li>Sparse infill pattern: Gyroid recommended</li>
+        <li>Enable Prime tower for multicolor prints</li>
+        <li>For thin objects, set outer/inner wall speed to 30 mm/s</li>
+        <li>Support top Z distance: 0.22 | XY distance: 0.5</li>
+        <li>Use Arachne wall generator for thin/rigid fonts</li>
+      </ul>
+    </div>
+    <div class="detail-section">
+      <h4>Tutorials & Links</h4>
+      <ul>
+        <li><a href="https://docs.google.com/document/d/1H5VBlOgDleh5YT61rl6sqhPoUkWyHEcXbfc-podMxUA/edit" target="_blank">Full Instruction Google Doc</a></li>
+        <li><a href="https://wiki.bambulab.com/en/p1/manual/screen-operation" target="_blank">Display Screen Instruction</a></li>
+        <li><a href="https://www.youtube.com/watch?v=5-doBgiDtHE" target="_blank">AMS Installation on P1S</a></li>
+        <li><a href="https://makerworld.com/en" target="_blank">Maker World (test prints)</a></li>
+        <li><a href="https://www.youtube.com/watch?v=q3pv55dV134" target="_blank">Multicolor Printing Tutorial</a></li>
+      </ul>
+    </div>
+    <div class="detail-section">
+      <h4>Weekly Maintenance</h4>
+      <ul>
+        <li>Clean print plate weekly with clear water</li>
+        <li>Bed leveling every 2 weeks via display settings</li>
+        <li>Clear nozzle clogs: heat to 250°C, push filament through manually</li>
+        <li>⚠ Turn OFF printer before tearing down extruder</li>
+      </ul>
+    </div>
+    <div class="detail-section">
+      <h4>Monthly Maintenance</h4>
+      <ul>
+        <li>Lubricate Z-axis lead screws with SuperLube (潤滑膏)</li>
+        <li>Lubricate Y/Z linear rods with sewing machine oil (針車油)</li>
+        <li>Wipe X-axis carbon rod with isopropyl alcohol only — NO oil</li>
+        <li>Clean chamber fan dust in the back</li>
+        <li>Do NOT touch XY belt unless software flags an issue</li>
+      </ul>
+    </div>
+    <div class="detail-section">
+      <h4>Filament Colors Available</h4>
+      <ul>
+        <li>Black ×3, Matte Ivory White ×2, Bambu Green ×3</li>
+        <li>Purple ×2, Blue ×2, Pink ×2, Orange ×2, Red ×2</li>
+        <li>Gold ×3, Yellow ×2, Grey ×2, Cocoa Brown ×2</li>
+        <li>Turquoise ×2, Magenta ×1, Beige ×1</li>
+        <li>Translucent: Purple, Light Jade, Cherry Pink, Ice Blue (×2 ea)</li>
+      </ul>
+    </div>
+  </div>
+  <span class="close-btn" onclick="toggleEquip('3d')">↑ Close</span>
+</div>
+
+<!-- Laser Cutter Detail -->
+<div class="equip-detail" id="detail-laser">
+  <h3>Epilog Laser Cutter — Fusion Edge</h3>
+  <div class="detail-grid">
+    <div class="detail-section">
+      <h4>Basic Operation</h4>
+      <ul>
+        <li>Refer to manual pages 95–104 for display panel operation</li>
+        <li><a href="https://docs.google.com/document/d/1FWqN31n48byImtTGaUoQFYEgoiyePHsktePWTnIswDM/edit" target="_blank">Instruction Google Doc</a></li>
+        <li><a href="https://youtu.be/vW44RvtjCio?si=-6zTwa2yXSCkYUng" target="_blank">Video Demo</a></li>
+      </ul>
+    </div>
+    <div class="detail-section">
+      <h4>Material Settings</h4>
+      <ul>
+        <li>Cardboard — Engrave: 20P 10S · Cut: 10P 10S</li>
+        <li>Acrylic — Engrave: 60P 20S · Cut: 80P 10S</li>
+        <li>MDF — Engrave: 60P 20S · Cut: 80P 10S</li>
+        <li>Balsa Wood — Engrave: 10P 30S · Cut: 40P 10S</li>
+      </ul>
+    </div>
+    <div class="detail-section">
+      <h4>File Setup Tutorials</h4>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=Pm6pWTwD_NY" target="_blank">Illustrator For Laser Cut</a></li>
+        <li><a href="https://www.youtube.com/watch?v=bMAJ4z_YIGA" target="_blank">Image Trace for Laser Cut</a></li>
+        <li><a href="https://www.youtube.com/watch?v=Gk9Pg0xCz4Y" target="_blank">Laser Engraving Photo</a></li>
+      </ul>
+    </div>
+    <div class="detail-section">
+      <h4>Maintenance</h4>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=l2p27WFHlWQ" target="_blank">Clean Laser Cut Lens</a></li>
+        <li><a href="https://www.youtube.com/watch?v=4zjGtlidifs" target="_blank">Calibration of Auto Focus</a></li>
+        <li><a href="https://www.youtube.com/watch?v=IPc4nr110eI" target="_blank">Full Maintenance Video</a></li>
+      </ul>
+    </div>
+  </div>
+  <span class="close-btn" onclick="toggleEquip('laser')">↑ Close</span>
+</div>
+
+<!-- Cricut Detail -->
+<div class="equip-detail" id="detail-cricut">
+  <h3>Cricut Machine</h3>
+  <div class="detail-grid">
+    <div class="detail-section">
+      <h4>Tutorials</h4>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=ruXXhAeRzn4" target="_blank">Group and Ungroup in Cricut Design Space</a></li>
+      </ul>
+    </div>
+  </div>
+  <span class="close-btn" onclick="toggleEquip('cricut')">↑ Close</span>
+</div>
+
+<!-- Sewing Machine Detail -->
+<div class="equip-detail" id="detail-sewing">
+  <h3>Sewing Machine — Brother GS 1710</h3>
+  <div class="detail-grid">
+    <div class="detail-section">
+      <h4>Getting Started</h4>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=4S0vFya63MA" target="_blank">Sewing Machine Tutorial</a></li>
+        <li><a href="https://www.youtube.com/watch?v=RrRWQ0Yp5ls" target="_blank">Brother GS — How to Thread (中文)</a></li>
+      </ul>
+    </div>
+  </div>
+  <span class="close-btn" onclick="toggleEquip('sewing')">↑ Close</span>
+</div>
+
+<!-- Heat Press Detail -->
+<div class="equip-detail" id="detail-heatpress">
+  <h3>Heat Press</h3>
+  <div class="detail-grid">
+    <div class="detail-section">
+      <h4>Overview</h4>
+      <ul>
+        <li>Used for heat transfer printing onto fabric and materials</li>
+        <li>Detailed instructions coming soon</li>
+      </ul>
+    </div>
+  </div>
+  <span class="close-btn" onclick="toggleEquip('heatpress')">↑ Close</span>
+</div>
+
+
+<!-- FILE SETUP SECTION -->
+<div id="file-setup" class="section-label">
+  <span class="tag">Section 02</span>
+  <h2>How to Set Up Files</h2>
+</div>
+
+<div class="setup-tabs">
+  <div class="setup-tab active" onclick="switchTab('laser-setup')">Laser Cutter</div>
+  <div class="setup-tab" onclick="switchTab('cricut-setup')">Cricut Machine</div>
+  <div class="setup-tab" onclick="switchTab('3d-setup')">3D Printer</div>
+</div>
+
+<!-- LASER CUTTER SETUP -->
+<div class="setup-panel active" id="laser-setup">
+  <p>Files for the Epilog laser cutter must be prepared in vector software (e.g. Adobe Illustrator). Lines must be clean, closed paths. Use stroke weight 0.001pt for cut lines.</p>
+
+  <div class="compare-section">
+    <h4>File Comparison — Cut Lines</h4>
+    <div class="compare-grid">
+      <div class="compare-item">
+        <div class="label correct-label">
+          <span class="label-dot correct"></span> Correct
+        </div>
+        <img src="Images/Cheese1_Cheese1.jpg" alt="Correct laser cutter file setup">
+        <ul class="notes">
+          <li class="ok">Single clean outline with proper closed paths</li>
+          <li class="ok">Holes and cutouts are well-defined, non-overlapping closed shapes</li>
+          <li class="ok">All lines are on correct layers (cut vs. engrave)</li>
+          <li class="ok">No stray points or open paths</li>
+        </ul>
+      </div>
+      <div class="compare-item">
+        <div class="label wrong-label">
+          <span class="label-dot wrong"></span> Incorrect
+        </div>
+        <img src="Images/Cheese2_Cheese2.jpg" alt="Wrong laser cutter file setup">
+        <ul class="notes">
+          <li class="bad">Shapes are not properly grouped — objects overlap without being merged</li>
+          <li class="bad">Some circles extend outside the boundary of the main shape</li>
+          <li class="bad">Filled shapes mixed in with outlines — machine cannot distinguish cut vs. engrave</li>
+          <li class="bad">Geometry is not aligned to a unified origin point</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="compare-section">
+    <h4>File Comparison — Tag / Keychain Design</h4>
+    <div class="compare-grid">
+      <div class="compare-item">
+        <div class="label correct-label"><span class="label-dot correct"></span> Correct</div>
+        <img src="Images/Pikachu1.jpg" alt="Correct laser cut tag file">
+        <ul class="notes">
+          <li class="ok">All artwork stays within the cut boundary (red outline)</li>
+          <li class="ok">Hole punch is a clean closed circle — properly placed inside the boundary</li>
+          <li class="ok">No stray paths or anchor points outside the tag border</li>
+          <li class="ok">Cut lines are clean, closed paths with no overlapping geometry</li>
+        </ul>
+      </div>
+      <div class="compare-item">
+        <div class="label wrong-label"><span class="label-dot wrong"></span> Incorrect</div>
+        <img src="Images/Pikachu2.jpg" alt="Wrong laser cut tag file">
+        <ul class="notes">
+          <li class="bad">Stray lines and anchor points floating outside the cut boundary</li>
+          <li class="bad">Loose paths will be cut by the machine — wasting material</li>
+          <li class="bad">Design elements extend beyond the tag border</li>
+          <li class="bad">File not cleaned up — extra nodes likely left over from image trace</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="rules">
+    <div class="rules-item">
+      <div class="rules-num">01</div>
+      <div class="rules-text">
+        <h5>Use Outlines Only for Cut Lines</h5>
+        <p>Set stroke to 0.001pt (hairline) with no fill. The laser reads stroke paths as cut lines.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">02</div>
+      <div class="rules-text">
+        <h5>Close All Paths</h5>
+        <p>Every cut shape must be a fully closed path. Open paths cause incomplete cuts or skipped sections.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">03</div>
+      <div class="rules-text">
+        <h5>Separate Cut and Engrave Layers</h5>
+        <p>Place cut lines on one layer and engrave fills/rasters on a separate layer. Use different colors to differentiate.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">04</div>
+      <div class="rules-text">
+        <h5>No Overlapping Shapes</h5>
+        <p>Shapes that overlap will be cut twice. Use Pathfinder → Unite to merge overlapping paths into one.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CRICUT SETUP -->
+<div class="setup-panel" id="cricut-setup">
+  <p>Cricut Design Space reads shapes and fills directly. Use solid shapes — not outlines — for vinyl cuts. Group same-color shapes together on the same layer to minimize cuts and material use.</p>
+
+  <div class="compare-section">
+    <h4>File Comparison — Shape vs. Outline</h4>
+    <div class="compare-grid">
+      <div class="compare-item">
+        <div class="label correct-label">
+          <span class="label-dot correct"></span> Correct
+        </div>
+        <img src="Images/LinkCorrect.jpg" alt="Correct Cricut file — solid shapes, grouped by color">
+        <ul class="notes">
+          <li class="ok">Character is built from solid filled shapes, not outlines/strokes</li>
+          <li class="ok">Each color group is on its own layer</li>
+          <li class="ok">Same-color shapes are joined (Boolean union) into single paths</li>
+          <li class="ok">Layers are clearly grouped and labeled by color</li>
+        </ul>
+      </div>
+      <div class="compare-item">
+        <div class="label wrong-label">
+          <span class="label-dot wrong"></span> Incorrect
+        </div>
+        <img src="Images/LinkWrong.jpg" alt="Wrong Cricut file — outlines, ungrouped shapes">
+        <ul class="notes">
+          <li class="bad">Design uses outlines/strokes — Cricut will cut the stroke path, not the filled shape</li>
+          <li class="bad">Different colors are mixed on the same layer</li>
+          <li class="bad">Shapes of the same color are not joined — results in unnecessary extra cuts</li>
+          <li class="bad">All elements are in a single group with no layer separation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="rules">
+    <div class="rules-item">
+      <div class="rules-num">01</div>
+      <div class="rules-text">
+        <h5>Use Shapes, Not Outlines</h5>
+        <p>Design with solid filled shapes. Remove all strokes. Cricut cuts the outline of filled regions — outlines/strokes will create unwanted double cuts.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">02</div>
+      <div class="rules-text">
+        <h5>One Layer Per Color</h5>
+        <p>Each vinyl color should be on its own separate layer. This tells Cricut which color mat to use for each cut pass.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">03</div>
+      <div class="rules-text">
+        <h5>Join Same-Color Shapes</h5>
+        <p>Shapes of the same color must be united (joined/welded) into a single path. This reduces cuts and avoids overlapping on the same vinyl sheet.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">04</div>
+      <div class="rules-text">
+        <h5>Group Elements by Color</h5>
+        <p>After uniting shapes by color, group each color's shapes together. This keeps layers organized when importing into Cricut Design Space.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3D PRINTER SETUP -->
+<div class="setup-panel" id="3d-setup">
+  <p>3D models must be properly set up in TinkerCAD or similar software before printing. Shapes must be aligned, grouped, and sized correctly — the Bambu Lab P1S cannot print floating geometry or objects too thin to extrude.</p>
+
+  <div class="compare-section">
+    <h4>Front View</h4>
+    <div class="compare-grid">
+      <div class="compare-item">
+        <div class="label correct-label"><span class="label-dot correct"></span> Correct</div>
+        <img src="Images/1_BunnyFC.jpg" alt="Correct 3D front view">
+        <ul class="notes">
+          <li class="ok">All shapes are grouped inside the container box</li>
+          <li class="ok">Face features (eyes, cheeks, nose) are properly aligned to the face</li>
+          <li class="ok">No shapes floating outside the main body</li>
+        </ul>
+      </div>
+      <div class="compare-item">
+        <div class="label wrong-label"><span class="label-dot wrong"></span> Incorrect</div>
+        <img src="Images/2_BunnyFW.jpg" alt="Wrong 3D front view">
+        <ul class="notes">
+          <li class="bad">Container is cylindrical instead of matching the body shape</li>
+          <li class="bad">Face elements are misaligned — cheek circles are too far out</li>
+          <li class="bad">Features not centered properly on the head</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-section">
+    <h4>Back View</h4>
+    <div class="compare-grid">
+      <div class="compare-item">
+        <div class="label correct-label"><span class="label-dot correct"></span> Correct</div>
+        <img src="Images/3_BunnyBC.jpg" alt="Correct 3D back view">
+        <ul class="notes">
+          <li class="ok">Tail is properly embedded/grouped — not floating</li>
+          <li class="ok">All shapes cut together into a unified solid</li>
+        </ul>
+      </div>
+      <div class="compare-item">
+        <div class="label wrong-label"><span class="label-dot wrong"></span> Incorrect</div>
+        <img src="Images/4_BunnyBW.jpg" alt="Wrong 3D back view">
+        <ul class="notes">
+          <li class="bad">Tail appears floating or not properly joined to body</li>
+          <li class="bad">Shapes are not merged — will create separate print islands</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-section">
+    <h4>Side View</h4>
+    <div class="compare-grid">
+      <div class="compare-item">
+        <div class="label correct-label"><span class="label-dot correct"></span> Correct</div>
+        <img src="Images/5_BunnySC.jpg" alt="Correct 3D side view">
+        <ul class="notes">
+          <li class="ok">Ears sit cleanly on the head — no floating elements</li>
+          <li class="ok">Model sits flat on the base plane</li>
+        </ul>
+      </div>
+      <div class="compare-item">
+        <div class="label wrong-label"><span class="label-dot wrong"></span> Incorrect</div>
+        <img src="Images/6_BunnySW.jpg" alt="Wrong 3D side view">
+        <ul class="notes">
+          <li class="bad">Small shapes (nose, cheeks) are floating away from the face</li>
+          <li class="bad">Shapes protruding in unintended directions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-section">
+    <h4>Top View</h4>
+    <div class="compare-grid">
+      <div class="compare-item">
+        <div class="label correct-label"><span class="label-dot correct"></span> Correct</div>
+        <img src="Images/7_BunnyTC.jpg" alt="Correct 3D top view">
+        <ul class="notes">
+          <li class="ok">Ears are symmetrically placed and fully attached to head</li>
+          <li class="ok">All elements centered on the X axis</li>
+        </ul>
+      </div>
+      <div class="compare-item">
+        <div class="label wrong-label"><span class="label-dot wrong"></span> Incorrect</div>
+        <img src="Images/8_BunnyTW.jpg" alt="Wrong 3D top view">
+        <ul class="notes">
+          <li class="bad">Stray geometry visible — shapes not properly grouped</li>
+          <li class="bad">Elements misaligned from center axis</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="rules">
+    <div class="rules-item">
+      <div class="rules-num">01</div>
+      <div class="rules-text">
+        <h5>No Floating Shapes</h5>
+        <p>Every shape must touch or be embedded in an adjacent shape. Floating geometry will either fail to print or fall off mid-print.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">02</div>
+      <div class="rules-text">
+        <h5>Shapes Must Not Protrude Out of Container</h5>
+        <p>Decorative features (eyes, ears, tail) should not stick out beyond the intended container or base. Group and cut shapes together to form a unified solid.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">03</div>
+      <div class="rules-text">
+        <h5>Align All Features Properly</h5>
+        <p>Facial features (eyes, nose, ears) must be precisely centered and aligned relative to the head/body. Check alignment from all views: front, side, top, and back.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">04</div>
+      <div class="rules-text">
+        <h5>Check Scale Before Export</h5>
+        <p>Always verify the model dimensions in mm before slicing. An incorrect scale can result in a model that's too small for detail or too large for the print bed.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">05</div>
+      <div class="rules-text">
+        <h5>Avoid Thin Walls & Objects</h5>
+        <p>No wall or feature should be thinner than ~0.8–1.2mm (depending on nozzle size). Objects too thin will not print — increase thickness or simplify the geometry.</p>
+      </div>
+    </div>
+    <div class="rules-item">
+      <div class="rules-num">06</div>
+      <div class="rules-text">
+        <h5>Group and Cut Shapes Together</h5>
+        <p>In TinkerCAD, use Group to merge all parts. Use holes/cutouts properly so embedded details (like recessed eyes) are correctly subtracted from the body.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- QUIZ SECTION -->
+<div id="quiz" class="section-label">
+  <span class="tag">Section 03</span>
+  <h2>Test Your Knowledge</h2>
+</div>
+
+<div class="quiz-container">
+  <div class="quiz-intro" id="quiz-intro">
+    <p>Test your understanding of file setup for the laser cutter and 3D printer. Choose a category to begin.</p>
+    <div class="quiz-category-select">
+      <div class="quiz-cat-card" onclick="startQuiz('3d')">
+        <div class="quiz-cat-number">🖨️</div>
+        <div class="quiz-cat-title">3D Printer</div>
+        <div class="quiz-cat-sub">TinkerCAD file setup</div>
+      </div>
+      <div class="quiz-cat-card" onclick="startQuiz('laser')">
+        <div class="quiz-cat-number">✂️</div>
+        <div class="quiz-cat-title">Laser Cutter</div>
+        <div class="quiz-cat-sub">Illustrator file setup</div>
+      </div>
+      <div class="quiz-cat-card" onclick="startQuiz('vinyl')">
+        <div class="quiz-cat-number">🦗</div>
+        <div class="quiz-cat-title">Vinyl Cut</div>
+        <div class="quiz-cat-sub">Cricut file setup</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-active" id="quiz-active" style="display:none;">
+    <div class="quiz-header">
+      <div class="quiz-progress-wrap">
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+        <span class="quiz-counter" id="quiz-counter"></span>
+      </div>
+      <span class="quiz-category-tag" id="quiz-category-tag"></span>
+    </div>
+
+    <div class="quiz-body">
+      <p class="quiz-question" id="quiz-question"></p>
+      <div class="quiz-options" id="quiz-options"></div>
+      <div class="quiz-feedback" id="quiz-feedback" style="display:none;"></div>
+    </div>
+
+    <div class="quiz-footer">
+      <button class="quiz-btn quiz-btn-ghost" onclick="quitQuiz()">Quit</button>
+      <button class="quiz-btn quiz-btn-primary" id="quiz-next-btn" onclick="nextQuestion()" style="display:none;">Next →</button>
+    </div>
+  </div>
+
+  <div class="quiz-results" id="quiz-results" style="display:none;">
+    <div class="quiz-score-display">
+      <div class="quiz-score-num" id="quiz-score-num"></div>
+      <div class="quiz-score-label">correct</div>
+    </div>
+    <p class="quiz-score-msg" id="quiz-score-msg"></p>
+    <div class="quiz-review" id="quiz-review"></div>
+    <div style="display:flex; gap:12px; margin-top:32px;">
+      <button class="quiz-btn quiz-btn-primary" onclick="retryQuiz()">Try Again</button>
+      <button class="quiz-btn quiz-btn-ghost" onclick="quitQuiz()">Back to Menu</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.quiz-container {
+  padding: 48px 40px;
+  border-bottom: 1px solid var(--border);
+  min-height: 360px;
+}
+.quiz-intro > p { font-size: 0.95rem; color: var(--gray); margin-bottom: 32px; }
+.quiz-category-select { display: flex; gap: 16px; flex-wrap: wrap; }
+.quiz-cat-card {
+  flex: 1; min-width: 180px; padding: 28px 24px; border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.15s; position: relative;
+}
+.quiz-cat-card:hover { background: var(--light); border-color: var(--black); }
+.quiz-cat-number { font-size: 2.2rem; font-family: 'DM Serif Display', serif; font-weight: 400; color: var(--border); margin-bottom: 8px; }
+.quiz-cat-title { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+.quiz-cat-sub { font-size: 0.8rem; color: var(--gray); }
+
+.quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+.quiz-progress-wrap { display: flex; align-items: center; gap: 12px; flex: 1; }
+.quiz-progress-bar { flex: 1; height: 2px; background: var(--border); max-width: 300px; }
+.quiz-progress-fill { height: 100%; background: var(--black); transition: width 0.3s; }
+.quiz-counter { font-size: 0.78rem; color: var(--gray); font-weight: 500; letter-spacing: 0.06em; }
+.quiz-category-tag { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); }
+
+.quiz-question { font-size: 1.05rem; font-weight: 500; line-height: 1.5; margin-bottom: 24px; max-width: 680px; }
+.quiz-options { display: flex; flex-direction: column; gap: 10px; max-width: 680px; }
+.quiz-option {
+  padding: 14px 18px; border: 1px solid var(--border); cursor: pointer;
+  font-size: 0.88rem; line-height: 1.4; transition: all 0.15s; text-align: left;
+  background: #fff; display: flex; align-items: flex-start; gap: 12px;
+}
+.quiz-option:hover:not(.locked) { border-color: var(--black); background: var(--light); }
+.quiz-option .opt-letter { font-weight: 600; font-size: 0.75rem; min-width: 18px; color: var(--gray); padding-top: 1px; }
+.quiz-option.selected { border-color: var(--black); background: var(--light); }
+.quiz-option.correct { border-color: var(--green); background: #f0faf4; color: var(--green); }
+.quiz-option.correct .opt-letter { color: var(--green); }
+.quiz-option.wrong { border-color: var(--red); background: #fff5f5; color: var(--red); }
+.quiz-option.wrong .opt-letter { color: var(--red); }
+.quiz-option.locked { cursor: default; }
+
+.quiz-feedback {
+  margin-top: 20px; padding: 16px 18px; font-size: 0.88rem; line-height: 1.6; max-width: 680px;
+  border-left: 3px solid var(--black);
+}
+.quiz-feedback.correct-fb { border-color: var(--green); background: #f0faf4; color: #1a5c36; }
+.quiz-feedback.wrong-fb { border-color: var(--red); background: #fff5f5; color: #992828; }
+
+.quiz-footer { display: flex; justify-content: space-between; margin-top: 28px; max-width: 680px; }
+.quiz-btn { padding: 10px 24px; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: #fff; transition: all 0.15s; }
+.quiz-btn-primary { background: var(--black); color: #fff; border-color: var(--black); }
+.quiz-btn-primary:hover { opacity: 0.8; }
+.quiz-btn-ghost:hover { border-color: var(--black); }
+
+.quiz-results { }
+.quiz-score-display { display: flex; align-items: baseline; gap: 8px; margin-bottom: 16px; }
+.quiz-score-num { font-family: 'DM Serif Display', serif; font-size: 4rem; font-weight: 400; line-height: 1; }
+.quiz-score-label { font-size: 1rem; color: var(--gray); }
+.quiz-score-msg { font-size: 0.95rem; color: var(--gray); margin-bottom: 32px; }
+
+.quiz-review { display: flex; flex-direction: column; gap: 0; max-width: 680px; border-top: 1px solid var(--border); }
+.review-item { padding: 16px 0; border-bottom: 1px solid var(--border); }
+.review-item .review-q { font-size: 0.85rem; font-weight: 500; margin-bottom: 6px; display: flex; gap: 10px; }
+.review-item .review-status { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.review-item .review-status.ok { color: var(--green); }
+.review-item .review-status.no { color: var(--red); }
+.review-item .review-ans { font-size: 0.82rem; color: var(--gray); }
+.review-item .review-ans span { color: var(--green); font-weight: 500; }
+
+@media (max-width: 768px) {
+  .quiz-container { padding: 32px 20px; }
+  .quiz-category-select { flex-direction: column; }
+}
+</style>
+
+<script>
+var allQuestions = [
+  {
+    category: "3d",
+    question: "How do you remove the part of the shape that the hole intersects?",
+    options: ["Group everything", "Click on Workplane", "Ungroup the object", "Click on a complex shape"],
+    correct: [0],
+    multi: false,
+    explanation: "In TinkerCAD, you select the hole shape and the solid shape, then Group them. The hole shape will subtract from the solid, removing the intersecting area."
+  },
+  {
+    category: "3d",
+    question: "To activate the ruler to automatically measure all sides of any object you must...",
+    options: ["Click the ruler", "Click the ruler, click the workplane, then click the object", "Drag the ruler onto the shape toolbar", "Click what you want to measure"],
+    correct: [1],
+    multi: false,
+    explanation: "You need to click the ruler, then click the workplane, then click the specific object. This three-step sequence activates automatic measurement of all sides."
+  },
+  {
+    category: "3d",
+    question: "In TinkerCAD, to set the workplane to inches you...",
+    options: ["Click Settings and change Units to Imperial", "Click on Grid Properties", "Click on the Ruler", "Click the Snap Grid dropdown and choose inches"],
+    correct: [0],
+    multi: false,
+    explanation: "Go to Settings in TinkerCAD and change the Units to Imperial. This switches all measurements on the workplane to inches."
+  },
+  {
+    category: "3d",
+    question: "To group multiple objects you need to...",
+    options: ["Ctrl + click on each shape", "Click on the symbol of 2 triangles split", "Select all shapes you want to group", "Select all shapes then click Union / Group"],
+    correct: [3],
+    multi: false,
+    explanation: "You must first select all the shapes you want to group, then click the Group button (or press Ctrl+G). Selecting alone is not enough."
+  },
+  {
+    category: "3d",
+    question: "How can you orbit around your creation?",
+    options: ["Click the arrow buttons", "Hold the left mouse button down and move mouse", "Click and drag the cube view in the top left", "Hold the scroll wheel down and move mouse"],
+    correct: [2],
+    multi: false,
+    explanation: "Click and drag the orientation cube in the top-left corner of the viewport to orbit freely around your model."
+  },
+  {
+    category: "3d",
+    question: "What icon do you press to see the entire working plane?",
+    options: ["Home Icon", "Center Icon", "Plus Sign", "Minus Sign"],
+    correct: [0],
+    multi: false,
+    explanation: "The Home icon resets the view to show the entire working plane, giving you a full overview of all objects."
+  },
+  {
+    category: "3d",
+    question: "What icon do you press to see just the object you are currently clicked on?",
+    options: ["Home Icon", "Center Icon", "Plus Sign", "Minus Sign"],
+    correct: [1],
+    multi: false,
+    explanation: "The Center icon zooms the view to focus on the currently selected object, filling the viewport with just that shape."
+  },
+  {
+    category: "3d",
+    question: "Which format should you export your TinkerCAD file as to submit to the 3D printing form?",
+    options: ["OBJ", "STL", "GLTF", "SVG"],
+    correct: [1],
+    multi: false,
+    explanation: "STL is the standard format for 3D printing. Most slicers including Bambu Studio accept STL files. SVG is for vector graphics; OBJ and GLTF are for 3D rendering."
+  },
+  {
+    category: "laser",
+    question: "In Illustrator, what colour should lines be to indicate vector cuts?",
+    options: ["RGB Red (R:255 G:0 B:0)", "RGB Blue (R:0 G:0 B:255)", "Black (R:0 G:0 B:0)", "Green (R:0 G:255 B:0)"],
+    correct: [0],
+    multi: false,
+    explanation: "Pure RGB Red (255, 0, 0) is the standard colour for vector cut lines for the Epilog laser cutter. The machine reads this colour to identify paths it should cut through."
+  },
+  {
+    category: "laser",
+    question: "In Illustrator, what colour should lines be to indicate engraving?",
+    options: ["RGB Red (R:255 G:0 B:0)", "RGB Blue (R:0 G:0 B:255)", "Black (R:0 G:0 B:0)", "Green (R:0 G:255 B:0)"],
+    correct: [1],
+    multi: false,
+    explanation: "Pure RGB Blue (0, 0, 255) is used to indicate engraving. The laser cutter distinguishes between cut lines (red) and engrave paths (blue) by colour."
+  },
+  {
+    category: "laser",
+    question: "In Illustrator, how can you change your units (e.g. points to cm)? Select all that apply.",
+    options: ["Right-click the ruler", "Properties > Document > Units", "Click an object, change the number, and add cm", "Right-click and show grid"],
+    correct: [0, 1, 2],
+    multi: true,
+    explanation: "There are three valid ways: right-clicking the ruler, going through Properties > Document > Units, or clicking an object and typing a value with cm. Showing the grid does not change units."
+  },
+  {
+    category: "laser",
+    question: "In Illustrator, what is the fastest way to make a rectangle that is exactly 3x5 cm?",
+    options: ["Rectangle tool, click artboard, type numbers, Enter", "Rectangle tool, click and drag", "Pen tool, double-click when done", "Polygon tool, hold space while drawing"],
+    correct: [0],
+    multi: false,
+    explanation: "With the Rectangle tool selected, clicking (not dragging) on the artboard opens a dialog where you can type exact dimensions. This is the fastest and most precise method."
+  },
+  {
+    category: "laser",
+    question: "In Illustrator, what is the fastest way to make a circle with a diameter of exactly 5 cm?",
+    options: ["Ellipse tool, click artboard, type in numbers, Enter", "Ellipse tool, click and drag", "Pen tool, double-click when done", "Search it online, copy and paste"],
+    correct: [0],
+    multi: false,
+    explanation: "With the Ellipse tool, clicking (not dragging) opens a dialog to enter exact width and height. Type 5cm for both to get a perfect circle."
+  },
+  {
+    category: "vinyl",
+    question: "If you want to use an image downloaded from the internet, how can you create vector shapes from it?",
+    options: ["Create a clipping mask", "Image Trace", "Use the Magic Wand Tool", "Use the Shape Tool"],
+    correct: [1],
+    multi: false,
+    explanation: "Image Trace in Illustrator converts a raster image into editable vector shapes. This is the correct way to prepare internet images for vinyl cutting."
+  },
+  {
+    category: "vinyl",
+    question: "When you are ready to send the file, what format should you export for vinyl cutting?",
+    options: ["SVG", "JPG", "Adobe Illustrator (.ai)", "DXF"],
+    correct: [0],
+    multi: false,
+    explanation: "SVG (Scalable Vector Graphics) is the standard export format for vinyl cutting. It preserves vector paths and is compatible with Cricut Design Space and most vinyl cutting software."
+  },
+  {
+    category: "vinyl",
+    question: "If you want to cut multiple colors, what do you need to do to indicate this?",
+    options: ["Group all shapes with the same color", "Create different layers for each color", "Fill the shapes with different colors", "Add stroke weight to the shapes"],
+    correct: [1],
+    multi: false,
+    explanation: "Creating separate layers for each color tells the machine which shapes belong to each vinyl color. Each layer represents one cutting pass with one color of vinyl."
+  },
+  {
+    category: "vinyl",
+    question: "If two shapes are next to each other or overlapping and you want them to become one shape, what should you do?",
+    options: ["Delete one of the shapes", "Put them on the same layer", "Group the two shapes together", "Use the Shape Builder Tool to merge them into one shape"],
+    correct: [3],
+    multi: false,
+    explanation: "The Shape Builder Tool (Shift+M) in Illustrator lets you merge overlapping or adjacent shapes into a single unified path. Grouping keeps them separate objects; merging makes them one."
+  },
+  {
+    category: "vinyl",
+    question: "How do you create cut-outs within a shape?",
+    options: ["Use the Eraser Tool", "Use the Slice Tool", "Use the Pathfinder Tool", "Use the Lasso Tool"],
+    correct: [2],
+    multi: false,
+    explanation: "The Pathfinder Tool (Minus Front) subtracts one shape from another, creating a cut-out or hole within a shape. This is essential for designs with internal negative spaces."
+  },
+  {
+    category: "vinyl",
+    question: "What is the correct way to indicate the shapes you want to cut?",
+    options: ["Use an outline stroke", "Use filled shapes", "Use layers", "Use text"],
+    correct: [1],
+    multi: false,
+    explanation: "Vinyl cutters read filled shapes to determine what to cut. Outlines or strokes alone are not sufficient — shapes must have a fill so the machine can identify the cut region."
+  },
+  {
+    category: "vinyl",
+    question: "What do you need to be aware of when creating the file?",
+    options: ["No overlapping shapes", "No multiple layers", "No filled colors", "No text"],
+    correct: [0],
+    multi: false,
+    explanation: "Overlapping shapes will cause the machine to cut the same area twice, wasting vinyl and potentially damaging the cut. Always merge or separate overlapping shapes before cutting."
+  },
+  {
+    category: "vinyl",
+    question: "What do you need to make sure you do to text before exporting the file?",
+    options: ["Object > Path > Join (Ctrl+J)", "Type > Glyphs", "Type > Create Outlines (Shift+Ctrl+O)", "Embed Links"],
+    correct: [2],
+    multi: false,
+    explanation: "Creating Outlines (Shift+Ctrl+O) converts live text into vector shapes, ensuring the font appears correctly even if the receiving machine does not have the font installed."
+  },
+  {
+    category: "vinyl",
+    question: "What is essential for vinyl cutting?",
+    options: ["The image must be mirrored (reflected)", "Must use complex colors", "Must add stroke weight", "Must group shapes"],
+    correct: [0],
+    multi: false,
+    explanation: "For heat transfer vinyl (HTV), the design must be mirrored before cutting because it will be applied face-down onto the fabric. Forgetting to mirror results in a backwards design."
+  },
+  {
+    category: "vinyl",
+    question: "How can you simplify Image Trace results into clean colors and well-defined shapes?",
+    options: ["Use AI to generate a clearer image", "Use the Shape Builder Tool to clean up and merge shapes", "Use the Pen Tool to add or delete anchor points", "All of the above"],
+    correct: [3],
+    multi: false,
+    explanation: "All three methods work together to clean up Image Trace results: AI can regenerate a cleaner source image, the Shape Builder Tool merges messy overlapping shapes, and the Pen Tool lets you refine individual anchor points."
+  },
+  {
+    category: "3d",
+    question: "What tool should you use to stack, align, and move objects onto the surfaces of other shapes?",
+    options: ["Cruise Tool", "Mirror Tool", "Group Tool", "Align Tool"],
+    correct: [0],
+    multi: false,
+    explanation: "The Cruise Tool lets you stack, align, and move objects onto the surfaces of other shapes in Tinkercad."
+  },
+  {
+    category: "3d",
+    question: "How do you bevel edges for a shape?",
+    options: ["Select shape \u2192 lock shape", "Select shape \u2192 click on hole", "Select shape \u2192 click on solid", "Select shape \u2192 adjust sides, bevel, and segment"],
+    correct: [3],
+    multi: false,
+    explanation: "To bevel edges, select the shape and then adjust the sides, bevel, and segment settings in the shape properties."
+  },
+  {
+    category: "laser",
+    question: "If you want to engrave an image, what do you need to do to include the image in your file?",
+    options: ["Outline the image", "Relink the image", "Embed the image", "Create Clipping Mask"],
+    correct: [2],
+    multi: false,
+    explanation: "You need to embed the image in your Illustrator file so the laser cutter can read and engrave it properly."
+  },
+  {
+    category: "laser",
+    question: "What do you need to make sure you do to text before exporting the file?",
+    options: ["Object \u2192 Path \u2192 Join (Ctrl + J)", "Type \u2192 Glyphs", "Type \u2192 Create Outlines (Shift + Ctrl + O)", "Embed Links"],
+    correct: [2],
+    multi: false,
+    explanation: "You must create outlines for all text (Type \u2192 Create Outlines) before exporting so the laser cutter reads the shapes correctly instead of relying on installed fonts."
+  },
+  {
+    category: "laser",
+    question: "What is the incorrect description of a cut line?",
+    options: ["Red stroke: RGB (R255, G0, B0)", "No fill color", "0.1 stroke weight", "Unclosed vector path"],
+    correct: [3],
+    multi: false,
+    explanation: "Cut lines must be closed vector paths, not unclosed. An unclosed path would not create a complete cut."
+  },
+  {
+    category: "laser",
+    question: "If two shapes are overlapped, and you want them to become one shape, what should you do?",
+    options: ["Delete one of the shapes", "Put them on the same layer", "Group the two shapes together", "Use the Shape Builder Tool to merge them into one shape"],
+    correct: [3],
+    multi: false,
+    explanation: "The Shape Builder Tool lets you merge overlapping shapes into a single unified shape, which is what the laser cutter needs."
+  },
+  {
+    category: "laser",
+    question: "How do you create cut-outs within a shape?",
+    options: ["Use the Eraser Tool", "Use the Slice Tool", "Use the Pathfinder Tool", "Use the Lasso Tool"],
+    correct: [2],
+    multi: false,
+    explanation: "The Pathfinder Tool allows you to subtract one shape from another to create cut-outs within a shape."
+  }
+];
+
+var currentQuestions = [];
+var currentIndex = 0;
+var score = 0;
+var selectedOptions = [];
+var answered = false;
+var currentCategory = "all";
+var reviewLog = [];
+
+function startQuiz(cat) {
+  currentCategory = cat;
+  currentQuestions = cat === "all" ? allQuestions.slice() : allQuestions.filter(function(q) { return q.category === cat; });
+  currentQuestions = currentQuestions.sort(function() { return Math.random() - 0.5; });
+  currentIndex = 0; score = 0; reviewLog = [];
+  document.getElementById("quiz-intro").style.display = "none";
+  document.getElementById("quiz-results").style.display = "none";
+  document.getElementById("quiz-active").style.display = "block";
+  renderQuestion();
+}
+
+function renderQuestion() {
+  var q = currentQuestions[currentIndex];
+  answered = false; selectedOptions = [];
+  var letters = ["A", "B", "C", "D"];
+  var total = currentQuestions.length;
+  var pct = (currentIndex / total) * 100;
+
+  document.getElementById("quiz-progress-fill").style.width = pct + "%";
+  document.getElementById("quiz-counter").textContent = (currentIndex + 1) + " / " + total;
+  document.getElementById("quiz-category-tag").textContent = q.category === "3d" ? "3D Printer" : q.category === "laser" ? "Laser Cutter" : "Vinyl Cut";
+  document.getElementById("quiz-question").textContent = q.question;
+  document.getElementById("quiz-feedback").style.display = "none";
+  document.getElementById("quiz-next-btn").style.display = "none";
+
+  var opts = document.getElementById("quiz-options");
+  opts.innerHTML = "";
+
+  if (q.multi) {
+    var hint = document.createElement("p");
+    hint.style.cssText = "font-size:0.78rem;color:var(--gray);margin-bottom:12px;font-style:italic;";
+    hint.textContent = "Select all that apply, then click Check.";
+    opts.appendChild(hint);
+  }
+
+  q.options.forEach(function(opt, i) {
+    var btn = document.createElement("button");
+    btn.className = "quiz-option";
+    btn.innerHTML = "<span class=\"opt-letter\">" + letters[i] + "</span><span>" + opt + "</span>";
+    btn.onclick = (function(idx, b, qq) {
+      return function() { selectOption(idx, b, qq); };
+    })(i, btn, q);
+    opts.appendChild(btn);
+  });
+
+  if (q.multi) {
+    var checkBtn = document.createElement("button");
+    checkBtn.className = "quiz-btn quiz-btn-primary";
+    checkBtn.id = "multi-check-btn";
+    checkBtn.style.marginTop = "12px";
+    checkBtn.textContent = "Check Answer";
+    checkBtn.onclick = function() { checkMulti(q); };
+    opts.appendChild(checkBtn);
+  }
+}
+
+function selectOption(i, btn, q) {
+  if (answered) return;
+  if (q.multi) {
+    var idx = selectedOptions.indexOf(i);
+    if (idx > -1) {
+      selectedOptions.splice(idx, 1);
+      btn.classList.remove("selected");
+    } else {
+      selectedOptions.push(i);
+      btn.classList.add("selected");
+    }
+  } else {
+    answered = true;
+    var allBtns = document.querySelectorAll(".quiz-option");
+    allBtns.forEach(function(b) { b.classList.add("locked"); });
+    var isCorrect = q.correct.indexOf(i) > -1;
+    btn.classList.add(isCorrect ? "correct" : "wrong");
+    if (!isCorrect) {
+      q.correct.forEach(function(ci) { if (allBtns[ci]) allBtns[ci].classList.add("correct"); });
+    }
+    if (isCorrect) score++;
+    showFeedback(isCorrect, q);
+    reviewLog.push({ q: q.question, correct: isCorrect, answer: q.options[i], rightAnswer: q.correct.map(function(c) { return q.options[c]; }).join(" / ") });
+    document.getElementById("quiz-next-btn").style.display = "block";
+  }
+}
+
+function checkMulti(q) {
+  if (answered || selectedOptions.length === 0) return;
+  answered = true;
+  var allBtns = document.querySelectorAll(".quiz-option");
+  var checkBtn = document.getElementById("multi-check-btn");
+  if (checkBtn) checkBtn.style.display = "none";
+  allBtns.forEach(function(b) { b.classList.add("locked"); });
+  var sortedSel = selectedOptions.slice().sort().join(",");
+  var sortedCorr = q.correct.slice().sort().join(",");
+  var isCorrect = sortedSel === sortedCorr;
+  if (isCorrect) {
+    score++;
+    selectedOptions.forEach(function(i) { if (allBtns[i]) allBtns[i].classList.add("correct"); });
+  } else {
+    selectedOptions.forEach(function(i) { if (allBtns[i]) allBtns[i].classList.add("wrong"); });
+    q.correct.forEach(function(i) { if (allBtns[i]) allBtns[i].classList.add("correct"); });
+  }
+  showFeedback(isCorrect, q);
+  reviewLog.push({ q: q.question, correct: isCorrect, answer: selectedOptions.map(function(i) { return q.options[i]; }).join(" + ") || "-", rightAnswer: q.correct.map(function(c) { return q.options[c]; }).join(" + ") });
+  document.getElementById("quiz-next-btn").style.display = "block";
+}
+
+function showFeedback(isCorrect, q) {
+  var fb = document.getElementById("quiz-feedback");
+  fb.style.display = "block";
+  fb.className = "quiz-feedback " + (isCorrect ? "correct-fb" : "wrong-fb");
+  fb.innerHTML = "<strong>" + (isCorrect ? "Correct!" : "Not quite.") + "</strong> " + q.explanation;
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= currentQuestions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById("quiz-active").style.display = "none";
+  document.getElementById("quiz-results").style.display = "block";
+  var total = currentQuestions.length;
+  var pct = Math.round((score / total) * 100);
+  document.getElementById("quiz-score-num").textContent = score + "/" + total;
+  var msg = "Keep practicing! Review the File Setup guides and try again.";
+  if (pct >= 90) msg = "Excellent work. You are ready to set up files independently.";
+  else if (pct >= 70) msg = "Good job! Review the sections you missed and try again.";
+  else if (pct >= 50) msg = "Getting there. Revisit the File Setup section above for a refresher.";
+  document.getElementById("quiz-score-msg").textContent = msg;
+
+  var review = document.getElementById("quiz-review");
+  review.innerHTML = "";
+  reviewLog.forEach(function(r) {
+    var div = document.createElement("div");
+    div.className = "review-item";
+    div.innerHTML = "<div class=\"review-q\"><span class=\"review-status " + (r.correct ? "ok" : "no") + "\">" + (r.correct ? "Correct" : "Incorrect") + "</span><span>" + r.q + "</span></div>" +
+      (!r.correct ? "<div class=\"review-ans\">Correct answer: <span>" + r.rightAnswer + "</span></div>" : "");
+    review.appendChild(div);
+  });
+}
+
+function retryQuiz() {
+  startQuiz(currentCategory);
+}
+
+function quitQuiz() {
+  document.getElementById("quiz-active").style.display = "none";
+  document.getElementById("quiz-results").style.display = "none";
+  document.getElementById("quiz-intro").style.display = "block";
+}
+</script>
+
+<footer>
+  <p>TES Equipment & File Guide</p>
+  <p style="font-size:0.75rem; color:#bbb;">Updated 2026</p>
+</footer>
+
+<script>
+function toggleEquip(id) {
+  const allDetails = document.querySelectorAll('.equip-detail');
+  const target = document.getElementById('detail-' + id);
+  const isOpen = target.classList.contains('active');
+  allDetails.forEach(d => d.classList.remove('active'));
+  if (!isOpen) target.classList.add('active');
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.setup-tab').forEach((t, i) => {
+    const panels = ['laser-setup', 'cricut-setup', '3d-setup'];
+    t.classList.toggle('active', panels[i] === id);
+  });
+  document.querySelectorAll('.setup-panel').forEach(p => {
+    p.classList.toggle('active', p.id === id);
+  });
+}
+</script>
+</body>
+</html>
